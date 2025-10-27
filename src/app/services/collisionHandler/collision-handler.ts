@@ -24,6 +24,18 @@ export class CollisionHandler {
     }
   }
 
+  createCollisionRecord(top: number, left: number, width: number, height: number) {
+    this.records.push(new CollisionRecord(top, left, width, height))
+    return this.records[this.records.length - 1].recordID
+  }
+
+  updateCollisionRecord(recordID: string, top: number, left: number, width: number, height: number) {
+    const record = this.records.find(record => record.recordID === recordID)
+    if (record) {
+      record.setData(top, left, width, height)
+    }
+  }
+
   removeCollisionRecord(recordID: string) {
     this.records = this.records.filter(record => record.recordID !== recordID)
   }

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import {GameLoopHandler} from '../gameLoopHandler/game-loop-handler';
+import {CollisionHandler} from '../collisionHandler/collision-handler';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +10,7 @@ export class BallController {
 
   constructor(
     gameLoopHandler: GameLoopHandler,
+    public collisionHandler: CollisionHandler
   ) {
     gameLoopHandler.getGameUpdate().subscribe(()=> {
       for (let ball of this.balls) {
@@ -18,7 +20,8 @@ export class BallController {
   }
 
   createBall = (size: number, speed: number, color: string, positionX: number = 100, positionY: number = 100) => {
-    this.balls.push(new Ball(size, speed, color, positionX, positionY))
+    const ballCollisionRecordID = this.collisionHandler.createCollisionRecord(positionX, positionY, size, size)
+    this.balls.push(new Ball(size, speed, color, ballCollisionRecordID, positionX, positionY))
   }
 
   getBalls() {
@@ -37,7 +40,9 @@ class Ball {
   private directionX: number = 1;
   private directionY: number = 1;
 
-  constructor(size: number, speed: number, color: string, positionX: number = 100, positionY: number = 100) {
+  private collisionRecordID: string = ''
+
+  constructor(size: number, speed: number, color: string, recordID: string, positionX: number = 100, positionY: number = 100) {
     if (size < 0) {
       console.error('A ball has been created with a negative size.');
     } else {
@@ -45,8 +50,13 @@ class Ball {
     }
     this.speed = speed;
     this.color = color;
+    this.collisionRecordID = recordID
     this.positionX = positionX;
     this.positionY = positionY;
+  }
+
+  getCollisionRecordID() {
+    return this.collisionRecordID;
   }
 
   setSize(size: number) {

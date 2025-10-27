@@ -2,6 +2,7 @@ import {ChangeDetectorRef, Component, ElementRef, ViewChild, viewChild} from '@a
 import {PlayerController} from '../../services/playerController/player-controller';
 import {BallController} from '../../services/ballController/ball-controller';
 import {GameLoopHandler} from '../../services/gameLoopHandler/game-loop-handler';
+import {CollisionHandler} from '../../services/collisionHandler/collision-handler';
 
 @Component({
   selector: 'app-game-page',
@@ -19,6 +20,7 @@ export class GamePage {
     public playerController: PlayerController,
     public ballController: BallController,
     public gameLoopHandler: GameLoopHandler,
+    public collisionHandler: CollisionHandler,
     public cd: ChangeDetectorRef,
   ) {
   }
@@ -40,6 +42,7 @@ export class GamePage {
     if (this.ctx) {
       this.ctx.fillStyle = 'white'
       this.ctx.fillRect(this.playerController.getPlayerPosition()() - 100, window.innerHeight * 19 / 20, 200, 25)
+
       for (let ball of this.ballController.getBalls()) {
         this.ctx.fillStyle = ball.getColor()
         this.ctx.arc(ball.getPositions().x, ball.getPositions().y, ball.getSize(), 0, 2 * Math.PI)

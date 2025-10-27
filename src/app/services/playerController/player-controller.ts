@@ -2,6 +2,7 @@ import {Injectable, signal} from '@angular/core';
 import {Observable} from 'rxjs';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {GameLoopHandler} from '../gameLoopHandler/game-loop-handler';
+import {CollisionHandler} from '../collisionHandler/collision-handler';
 
 @Injectable({
   providedIn: 'root'
@@ -11,9 +12,11 @@ export class PlayerController {
   private desiredPosition = signal<number>(0) //Where the player wants to be
   private playerSpeed = 0.5
   private playerSize = 100
+  private playerCollisionID: string
 
   constructor(
     gameLoopHandler: GameLoopHandler,
+    collisionHandler: CollisionHandler,
   ) {
     gameLoopHandler.getGameUpdate().subscribe(() => {
       if (Math.abs(this.desiredPosition() - this.playerPosition()) > 10) {
@@ -23,7 +26,9 @@ export class PlayerController {
           this.changePlayerPosition(Math.round(this.playerPosition() + this.playerSpeed * gameLoopHandler.getDelta()()))
         }
       }
+      collisionHandler.updateCollisionRecord(this.playerCollisionID, this.getPlayerPosition()() - 100, window.innerHeight * 19 / 20, 200, 25)
     })
+    this.playerCollisionID = collisionHandler.createCollisionRecord(this.getPlayerPosition()() - 100, window.innerHeight * 19 / 20, 200, 25)
   }
 
   changePlayerPosition(x: number) {
