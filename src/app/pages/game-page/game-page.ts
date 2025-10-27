@@ -1,19 +1,58 @@
-import { Component } from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, ViewChild, viewChild} from '@angular/core';
 import {PlayerController} from '../../services/playerController/player-controller';
-import {Ball} from '../../assets/ball/ball';
+import {BallController} from '../../services/ballController/ball-controller';
+import {GameLoopHandler} from '../../services/gameLoopHandler/game-loop-handler';
 
 @Component({
   selector: 'app-game-page',
   imports: [
-    Ball
   ],
   templateUrl: './game-page.html',
   styleUrl: './game-page.css',
 })
 export class GamePage {
+  @ViewChild('gameCanvas') canvas!: ElementRef<HTMLCanvasElement>;
+  private ctx: CanvasRenderingContext2D | null = null;
+  private lastTimestamp = 0;
 
   constructor(
     public playerController: PlayerController,
-  ) { }
+    public ballController: BallController,
+    public gameLoopHandler: GameLoopHandler,
+    public cd: ChangeDetectorRef,
+  ) {
+  }
 
+  renderScene = (timestamp: number) => {
+    this.gameLoopHandler.setDelta(timestamp - this.lastTimestamp) // delta time
+    this.lastTimestamp = timestamp
+
+    if (!this.gameLoopHandler.getGameRunning()()) {
+      requestAnimationFrame(this.renderScene)
+      return
+    }
+
+    this.gameLoopHandler.updateGame()
+    const canvasEl: HTMLCanvasElement = this.canvas.nativeElement
+    canvasEl.width = window.innerWidth
+    canvasEl.height = window.innerHeight
+    this.ctx = canvasEl.getContext('2d')
+    if (this.ctx) {
+      this.ctx.fillStyle = 'white'
+      this.ctx.fillRect(this.playerController.getPlayerPosition()() - 100, window.innerHeight * 19 / 20, 200, 25)
+      for (let ball of this.ballController.getBalls()) {
+        this.ctx.fillStyle = ball.getColor()
+        this.ctx.arc(ball.getPositions().x, ball.getPositions().y, ball.getSize(), 0, 2 * Math.PI)
+        this.ctx.fill()
+      }
+    }
+    requestAnimationFrame(this.renderScene)
+  }
+
+
+  ngAfterViewInit() {
+    this.ballController.createBall(10, 0.1, 'red')
+    requestAnimationFrame(this.renderScene)
+    this.cd.detectChanges()
+  }
 }

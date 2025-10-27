@@ -13,7 +13,4 @@ export class App {
   constructor(private playerController: PlayerController) {
   }
 
-  pointerMoved(event: PointerEvent) {
-    this.playerController.changePlayerPosition(event.clientX)
-  }
 }

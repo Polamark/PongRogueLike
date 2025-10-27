@@ -1,12 +1,1 @@
-<app-ball/>
-<app-ball/>
-<app-ball/>
-<app-ball/>
-<app-ball/>
-<app-ball/>
-<app-ball/>
-<app-ball/>
-<app-ball/>
-
-<div class="absolute bg-gray-200 h-4 top-19/20 center-transform-x rounded-xl" [style.width.px]="playerController.getPlayerSize()" [style.left.px]="playerController.getPlayerPosition()">
-</div>
+<canvas class="w-screen h-screen" (pointermove)="playerController.changeDesiredPosition($event.clientX)" #gameCanvas></canvas>
