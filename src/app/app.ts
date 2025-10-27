@@ -1,5 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import {PlayerController} from './services/playerController/player-controller';
 
 @Component({
   selector: 'app-root',
@@ -9,4 +10,10 @@ import { RouterOutlet } from '@angular/router';
 })
 export class App {
   protected readonly title = signal('game');
+  constructor(private playerController: PlayerController) {
+  }
+
+  pointerMoved(event: PointerEvent) {
+    this.playerController.changePlayerPosition(event.clientX)
+  }
 }
