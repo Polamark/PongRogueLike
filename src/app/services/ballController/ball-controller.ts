@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {GameLoopHandler} from '../gameLoopHandler/game-loop-handler';
 import {CollisionHandler} from '../collisionHandler/collision-handler';
 
@@ -12,16 +12,38 @@ export class BallController {
     gameLoopHandler: GameLoopHandler,
     public collisionHandler: CollisionHandler
   ) {
-    gameLoopHandler.getGameUpdate().subscribe(()=> {
+    gameLoopHandler.getGameUpdate().subscribe(() => {
       for (let ball of this.balls) {
         ball.setPositions(ball.getPositions().x + ball.getDirections().x * ball.getSpeed() * gameLoopHandler.getDelta()(), ball.getPositions().y + ball.getDirections().y * ball.getSpeed() * gameLoopHandler.getDelta()())
+        collisionHandler.updateCollisionRecord(ball.getCollisionRecordID(), ball.getPositions().x, ball.getPositions().y, ball.getSize(), ball.getSize())
+      }
+    })
+    collisionHandler.getCollisionListener().subscribe(collision => {
+      let ball = this.balls.find((x) => {
+        return x.getCollisionRecordID() == collision?.sourceID
+      })
+      if (ball) {
+        if (collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().player || collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().wall) {
+          if (collision.sidesCollided.top) {
+            ball.setDirections(ball.getDirections().x, 1)
+          } else if (collision.sidesCollided.bottom) {
+            ball.setDirections(ball.getDirections().x, -1)
+          } else if (collision.sidesCollided.left) {
+            ball.setDirections(1, ball.getDirections().y)
+          } else if (collision.sidesCollided.right) {
+            ball.setDirections(-1, ball.getDirections().y)
+            console.log(ball.getDirections().x)
+          }
+        }
       }
     })
   }
 
   createBall = (size: number, speed: number, color: string, positionX: number = 100, positionY: number = 100) => {
-    const ballCollisionRecordID = this.collisionHandler.createCollisionRecord(positionX, positionY, size, size)
-    this.balls.push(new Ball(size, speed, color, ballCollisionRecordID, positionX, positionY))
+    let ball = new Ball(size, speed, color, "", positionX, positionY)
+    const ballCollisionRecordID = this.collisionHandler.createCollisionRecord(positionX, positionY, size, size, ball, this.collisionHandler.getGameObjectTypes().ball, this.collisionHandler.getRenderTypes().circle)
+    ball.setCollisionRecordID(ballCollisionRecordID)
+    this.balls.push(ball)
   }
 
   getBalls() {
@@ -57,6 +79,10 @@ class Ball {
 
   getCollisionRecordID() {
     return this.collisionRecordID;
+  }
+
+  setCollisionRecordID(recordID: string) {
+    this.collisionRecordID = recordID;
   }
 
   setSize(size: number) {

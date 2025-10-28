@@ -10,6 +10,8 @@ export class GameLoopHandler {
   private gameUpdate = signal<number>(0)
   private gameUpdate$ = toObservable(this.gameUpdate)
 
+
+
   setDelta(delta: number) {
     this.delta.set(delta)
   }

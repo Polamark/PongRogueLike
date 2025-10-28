@@ -23,6 +23,11 @@ export class GamePage {
     public collisionHandler: CollisionHandler,
     public cd: ChangeDetectorRef,
   ) {
+    document.addEventListener('keydown', (event) => {
+      if (event.code == "Space") {
+        gameLoopHandler.setGameRunning(!gameLoopHandler.getGameRunning()())
+      }
+    })
   }
 
   renderScene = (timestamp: number) => {
@@ -41,7 +46,8 @@ export class GamePage {
     this.ctx = canvasEl.getContext('2d')
     if (this.ctx) {
       this.ctx.fillStyle = 'white'
-      this.ctx.fillRect(this.playerController.getPlayerPosition()() - 100, window.innerHeight * 19 / 20, 200, 25)
+      this.ctx.fillRect(0, 0, 1, window.innerHeight)
+      this.ctx.fillRect(this.playerController.getPlayerPosition()() - this.playerController.getPlayerSize()() / 2, window.innerHeight * 19 / 20, this.playerController.getPlayerSize()(), this.playerController.getPlayerHeight()())
 
       for (let ball of this.ballController.getBalls()) {
         this.ctx.fillStyle = ball.getColor()
@@ -54,8 +60,11 @@ export class GamePage {
 
 
   ngAfterViewInit() {
-    this.ballController.createBall(10, 0.1, 'red')
+    this.ballController.createBall(50, 0.25, 'red')
     requestAnimationFrame(this.renderScene)
+    this.collisionHandler.createCollisionRecord(1,0, 1, window.innerHeight, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
+    this.collisionHandler.createCollisionRecord(window.innerWidth,1, 1, window.innerHeight, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
+    this.collisionHandler.createCollisionRecord(0,0, window.innerWidth, 1, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
     this.cd.detectChanges()
   }
 }

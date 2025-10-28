@@ -8,59 +8,72 @@ import {CollisionHandler} from '../collisionHandler/collision-handler';
   providedIn: 'root'
 })
 export class PlayerController {
-  private playerPosition = signal<number>(0) //Where the player is
-  private desiredPosition = signal<number>(0) //Where the player wants to be
-  private playerSpeed = 0.5
-  private playerSize = 100
+  private playerObject = new playerObject()
   private playerCollisionID: string
 
   constructor(
     gameLoopHandler: GameLoopHandler,
     collisionHandler: CollisionHandler,
   ) {
+    this.playerCollisionID = collisionHandler.createCollisionRecord(this.getCenteredPlayerPosition(), window.innerHeight * 19 / 20, this.playerObject.playerSize(), this.playerObject.playerHeight(), this.playerObject, collisionHandler.getGameObjectTypes().player, collisionHandler.getRenderTypes().rectangle)
     gameLoopHandler.getGameUpdate().subscribe(() => {
-      if (Math.abs(this.desiredPosition() - this.playerPosition()) > 10) {
-        if (this.desiredPosition() < this.playerPosition()) {
-          this.changePlayerPosition(Math.round((this.playerPosition() - this.playerSpeed * gameLoopHandler.getDelta()())))
-        } else if (this.desiredPosition() > this.playerPosition()) {
-          this.changePlayerPosition(Math.round(this.playerPosition() + this.playerSpeed * gameLoopHandler.getDelta()()))
+      if (Math.abs(this.playerObject.desiredPosition() - this.playerObject.playerPosition()) > 10) {
+        if (this.playerObject.desiredPosition() < this.playerObject.playerPosition()) {
+          this.changePlayerPosition(Math.round((this.playerObject.playerPosition() - this.playerObject.playerSpeed() * gameLoopHandler.getDelta()())))
+        } else if (this.playerObject.desiredPosition() > this.playerObject.playerPosition()) {
+          this.changePlayerPosition(Math.round(this.playerObject.playerPosition() + this.playerObject.playerSpeed() * gameLoopHandler.getDelta()()))
         }
       }
-      collisionHandler.updateCollisionRecord(this.playerCollisionID, this.getPlayerPosition()() - 100, window.innerHeight * 19 / 20, 200, 25)
+      collisionHandler.updateCollisionRecord(this.playerCollisionID, this.getCenteredPlayerPosition(), window.innerHeight * 19 / 20, this.playerObject.playerSize(), this.playerObject.playerHeight())
     })
-    this.playerCollisionID = collisionHandler.createCollisionRecord(this.getPlayerPosition()() - 100, window.innerHeight * 19 / 20, 200, 25)
+
   }
 
   changePlayerPosition(x: number) {
-    this.playerPosition.set(x)
+    this.playerObject.playerPosition.set(x)
   }
 
   getPlayerPosition() {
-    return this.playerPosition
+    return this.playerObject.playerPosition
+  }
+
+  getCenteredPlayerPosition() {
+    return this.playerObject.playerPosition() - this.playerObject.playerSize() / 2
   }
 
   changeDesiredPosition(x: number) {
-    this.desiredPosition.set(x)
+    this.playerObject.desiredPosition.set(x)
   }
 
   getDesiredPosition() {
-    return this.desiredPosition
+    return this.playerObject.desiredPosition
   }
 
   changePlayerSpeed(speed: number) {
-    this.playerSpeed = speed
+    this.playerObject.playerSpeed.set(speed)
   }
 
   getPlayerSpeed() {
-    return this.playerSpeed
+    return this.playerObject.playerSpeed
   }
 
   changePlayerSize(size: number) {
-    this.playerSize = size
+    this.playerObject.playerSize.set(size)
   }
-
 
   getPlayerSize() {
-    return this.playerSize
+    return this.playerObject.playerSize
   }
+
+  getPlayerHeight() {
+    return this.playerObject.playerHeight
+  }
+}
+
+class playerObject {
+  public playerPosition = signal<number>(0) //Where the player is
+  public desiredPosition = signal<number>(0) //Where the player wants to be
+  public playerSpeed = signal<number>(0.5)
+  public playerSize = signal<number>(170)
+  public playerHeight = signal<number>(15)
 }
