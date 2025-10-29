@@ -1,1 +1,3 @@
 <canvas (pointermove)="playerController.changeDesiredPosition($event.clientX)" #gameCanvas></canvas>
+
+<h1 class="fixed top-5 text-center text-amber-300 text-3xl bg-black w-15 h-15 left-5">{{Math.round(this.gameLoopHandler.getFps()())}}</h1>

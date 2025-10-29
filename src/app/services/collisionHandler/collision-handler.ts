@@ -33,18 +33,30 @@ export class CollisionHandler {
           record.getData().bottom > other.getData().top
         ) {
 
-          let distances = {
-            left: Math.abs(record.getData().left - other.getData().right) < 5,
-            right: Math.abs(record.getData().right - other.getData().left) < 5,
-            top: Math.abs(record.getData().top - other.getData().bottom) < 5,
-            bottom: Math.abs(record.getData().bottom - other.getData().top) < 5,
+          let distance = [
+            Math.abs(record.getData().left - other.getData().right),
+            Math.abs(record.getData().right - other.getData().left),
+            Math.abs(record.getData().top - other.getData().bottom),
+            Math.abs(record.getData().bottom - other.getData().top),
+          ]
+
+          let lowest = Math.min(...distance)
+
+          let collisions = {
+            left: distance[0] == lowest,
+            right: distance[1] == lowest,
+            top: distance[2] == lowest,
+            bottom: distance[3] == lowest,
+
           }
+
+
           if (!record.isTouching(other)) {
             this.collisionListener.next({
               source: record,
               sourceID: record.recordID,
               target: other,
-              sidesCollided: distances,
+              sidesCollided: collisions,
             })
           }
           record.touch(other)
@@ -67,9 +79,6 @@ export class CollisionHandler {
     const record = this.records.find(record => record.recordID === recordID)
     if (record) {
       record.setData(left, top, width, height)
-      if (record.getGameObject().objectType == gameObjectType.ball) {
-        console.log(record.getData())
-      }
     }
   }
 

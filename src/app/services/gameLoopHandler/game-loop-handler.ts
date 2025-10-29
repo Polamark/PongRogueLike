@@ -6,6 +6,7 @@ import {toObservable} from '@angular/core/rxjs-interop';
 })
 export class GameLoopHandler {
   private delta = signal<number>(0)
+  private fps = signal<number>(60)
   private gameRunning = signal<boolean>(true)
   private gameUpdate = signal<number>(0)
   private gameUpdate$ = toObservable(this.gameUpdate)
@@ -14,6 +15,7 @@ export class GameLoopHandler {
 
   setDelta(delta: number) {
     this.delta.set(delta)
+    this.fps.set(1000 / delta)
   }
 
   setGameRunning(gameRunning: boolean) {
@@ -22,6 +24,10 @@ export class GameLoopHandler {
 
   getDelta() {
     return this.delta
+  }
+
+  getFps() {
+    return this.fps
   }
 
   getGameRunning() {

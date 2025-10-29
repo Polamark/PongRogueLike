@@ -23,7 +23,11 @@ export class BallController {
         return x.getCollisionRecordID() == collision?.sourceID
       })
       if (ball) {
-        if (collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().player || collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().wall) {
+        if (
+          collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().player ||
+          collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().wall ||
+          collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().ball ||
+          collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().block) {
           if (collision.sidesCollided.top) {
             ball.setDirections(ball.getDirections().x, 1)
           } else if (collision.sidesCollided.bottom) {
@@ -39,7 +43,7 @@ export class BallController {
     })
   }
 
-  createBall = (size: number, speed: number, color: string, positionX: number = 100, positionY: number = 100) => {
+  createBall = (positionX: number = 100, positionY: number = 100, size: number, speed: number, color: string) => {
     let ball = new Ball(size, speed, color, "", positionX, positionY)
     const ballCollisionRecordID = this.collisionHandler.createCollisionRecord(positionX, positionY, size, size, ball, this.collisionHandler.getGameObjectTypes().ball, this.collisionHandler.getRenderTypes().circle)
     ball.setCollisionRecordID(ballCollisionRecordID)
@@ -59,8 +63,8 @@ class Ball {
   private positionX: number = 100;
   private positionY: number = 100;
 
-  private directionX: number = 1;
-  private directionY: number = 1;
+  private directionX: number = Math.random() > 0.5 ? 1 : -1;
+  private directionY: number = -1;
 
   private collisionRecordID: string = ''
 
@@ -69,6 +73,9 @@ class Ball {
       console.error('A ball has been created with a negative size.');
     } else {
       this.size = size;
+    }
+    if (color == '') {
+      console.error('A ball has been created with an empty color.');
     }
     this.speed = speed;
     this.color = color;

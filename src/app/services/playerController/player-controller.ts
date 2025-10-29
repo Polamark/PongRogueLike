@@ -71,9 +71,9 @@ export class PlayerController {
 }
 
 class playerObject {
-  public playerPosition = signal<number>(0) //Where the player is
-  public desiredPosition = signal<number>(0) //Where the player wants to be
+  public playerPosition = signal<number>(window.innerWidth/2) //Where the player is
+  public desiredPosition = signal<number>(window.innerWidth/2) //Where the player wants to be
   public playerSpeed = signal<number>(0.5)
-  public playerSize = signal<number>(170)
+  public playerSize = signal<number>(17000)
   public playerHeight = signal<number>(15)
 }

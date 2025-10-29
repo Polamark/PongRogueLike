@@ -3,11 +3,11 @@ import {PlayerController} from '../../services/playerController/player-controlle
 import {BallController} from '../../services/ballController/ball-controller';
 import {GameLoopHandler} from '../../services/gameLoopHandler/game-loop-handler';
 import {CollisionHandler} from '../../services/collisionHandler/collision-handler';
+import {BlockController} from '../../services/blockController/block-controller';
 
 @Component({
   selector: 'app-game-page',
-  imports: [
-  ],
+  imports: [],
   templateUrl: './game-page.html',
   styleUrl: './game-page.css',
 })
@@ -19,6 +19,7 @@ export class GamePage {
   constructor(
     public playerController: PlayerController,
     public ballController: BallController,
+    public blockController: BlockController,
     public gameLoopHandler: GameLoopHandler,
     public collisionHandler: CollisionHandler,
     public cd: ChangeDetectorRef,
@@ -46,13 +47,20 @@ export class GamePage {
     this.ctx = canvasEl.getContext('2d')
     if (this.ctx) {
       this.ctx.fillStyle = 'white'
-      this.ctx.fillRect(0, 0, 1, window.innerHeight)
       this.ctx.fillRect(this.playerController.getPlayerPosition()() - this.playerController.getPlayerSize()() / 2, window.innerHeight * 19 / 20, this.playerController.getPlayerSize()(), this.playerController.getPlayerHeight()())
 
+      for (let block of this.blockController.getBlocks()) {
+        this.ctx.fillStyle = block.getColor()
+        this.ctx.fillRect(block.getPositions().x, block.getPositions().y, block.getSize().x, block.getSize().y)
+        this.ctx.closePath()
+      }
+
       for (let ball of this.ballController.getBalls()) {
+        this.ctx.beginPath()
         this.ctx.fillStyle = ball.getColor()
         this.ctx.arc(ball.getPositions().x, ball.getPositions().y, ball.getSize(), 0, 2 * Math.PI)
         this.ctx.fill()
+        this.ctx.closePath()
       }
     }
     requestAnimationFrame(this.renderScene)
@@ -60,11 +68,33 @@ export class GamePage {
 
 
   ngAfterViewInit() {
-    this.ballController.createBall(50, 0.25, 'red')
+    for (let i = 0; i < 1; i++) {
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20), 10, 0.25, 'red', )
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'blue')
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'green')
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'cyan')
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'yellow')
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'orange')
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'white')
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'gray')
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'purple')
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'pink')
+    }
+
+    this.blockController.createBlock(100, 100, 100, 25, '#003764')
     requestAnimationFrame(this.renderScene)
-    this.collisionHandler.createCollisionRecord(1,0, 1, window.innerHeight, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
-    this.collisionHandler.createCollisionRecord(window.innerWidth,1, 1, window.innerHeight, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
-    this.collisionHandler.createCollisionRecord(0,0, window.innerWidth, 1, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
+    let left = this.collisionHandler.createCollisionRecord(-300, -300, 300, window.innerHeight + 600, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
+    let right = this.collisionHandler.createCollisionRecord(window.innerWidth, -300, 300, window.innerHeight + 600, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
+    let top = this.collisionHandler.createCollisionRecord(-300, -300, window.innerWidth + 600, 300, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
+    let bottom = this.collisionHandler.createCollisionRecord(-300, window.innerHeight, window.innerWidth + 600, 300, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
+    window.onresize = () => {
+      this.collisionHandler.updateCollisionRecord(left, -300, -300, 300, window.innerHeight + 600)
+      this.collisionHandler.updateCollisionRecord(right, window.innerWidth, -300, 300, window.innerHeight + 600)
+      this.collisionHandler.updateCollisionRecord(top, -300, -300, window.innerWidth + 600, 300)
+      this.collisionHandler.updateCollisionRecord(bottom, -300, window.innerHeight, window.innerWidth + 600, 300)
+    }
     this.cd.detectChanges()
   }
+
+  protected readonly Math = Math;
 }
