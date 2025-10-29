@@ -24,7 +24,6 @@ export class BallController {
       })
       if (ball) {
         if (
-          collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().player ||
           collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().wall ||
           collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().ball ||
           collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().block) {
@@ -32,6 +31,27 @@ export class BallController {
             ball.setDirections(ball.getDirections().x, 1)
           } else if (collision.sidesCollided.bottom) {
             ball.setDirections(ball.getDirections().x, -1)
+          } else if (collision.sidesCollided.left) {
+            ball.setDirections(1, ball.getDirections().y)
+          } else if (collision.sidesCollided.right) {
+            ball.setDirections(-1, ball.getDirections().y)
+            console.log(ball.getDirections().x)
+          }
+        } else if (collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().void) {
+          this.removeBall(ball)
+        } else if (collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().player) {
+          if (collision.sidesCollided.top) {
+            if (collision.distancesFromFaces.left < collision.distancesFromFaces.right) {
+              ball.setDirections(1, 1)
+            } else {
+              ball.setDirections(-1, 1)
+            }
+          } else if (collision.sidesCollided.bottom) {
+            if (collision.distancesFromFaces.left < collision.distancesFromFaces.right) {
+              ball.setDirections(1, -1)
+            } else {
+              ball.setDirections(-1, -1)
+            }
           } else if (collision.sidesCollided.left) {
             ball.setDirections(1, ball.getDirections().y)
           } else if (collision.sidesCollided.right) {
@@ -52,6 +72,11 @@ export class BallController {
 
   getBalls() {
     return this.balls
+  }
+
+  removeBall(ball: Ball) {
+    this.balls = this.balls.filter(x => x !== ball)
+    this.collisionHandler.removeCollisionRecord(ball.getCollisionRecordID())
   }
 }
 

@@ -14,7 +14,8 @@ export class CollisionHandler {
   constructor(
     private gameLoopHandler: GameLoopHandler,
   ) {
-    gameLoopHandler.getGameUpdate().subscribe(() => {
+    gameLoopHandler.getGameUpdate().subscribe((x) => {
+
       this.checkCollision()
     })
   }
@@ -33,30 +34,29 @@ export class CollisionHandler {
           record.getData().bottom > other.getData().top
         ) {
 
-          let distance = [
-            Math.abs(record.getData().left - other.getData().right),
-            Math.abs(record.getData().right - other.getData().left),
-            Math.abs(record.getData().top - other.getData().bottom),
-            Math.abs(record.getData().bottom - other.getData().top),
-          ]
-
-          let lowest = Math.min(...distance)
-
-          let collisions = {
-            left: distance[0] == lowest,
-            right: distance[1] == lowest,
-            top: distance[2] == lowest,
-            bottom: distance[3] == lowest,
-
-          }
-
-
           if (!record.isTouching(other)) {
+            let distance = {
+              left: Math.abs(record.getData().left - other.getData().right),
+              right: Math.abs(record.getData().right - other.getData().left),
+              top: Math.abs(record.getData().top - other.getData().bottom),
+              bottom: Math.abs(record.getData().bottom - other.getData().top),
+            }
+
+            let lowest = Math.min(distance.left, distance.right, distance.top, distance.bottom)
+
+            let collisions = {
+              left: distance.left == lowest,
+              right: distance.right == lowest,
+              top: distance.top == lowest,
+              bottom: distance.bottom == lowest,
+
+            }
             this.collisionListener.next({
               source: record,
               sourceID: record.recordID,
               target: other,
               sidesCollided: collisions,
+              distancesFromFaces: distance,
             })
           }
           record.touch(other)
@@ -189,6 +189,7 @@ class gameObjectType {
   static ball = 'ball'
   static block = 'block'
   static wall = 'wall'
+  static void = 'void'
   static unassigned = 'unassigned'
 }
 
@@ -206,5 +207,11 @@ interface collisionBroadcast {
     right: boolean,
     top: boolean,
     bottom: boolean,
+  },
+  distancesFromFaces: {
+    left: number,
+    right: number,
+    top: number,
+    bottom: number,
   }
 }

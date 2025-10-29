@@ -29,6 +29,24 @@ export class BlockController {
     this.blocks.push(block)
   }
 
+  createBlockGrid(rows: number, columns: number, gap: number, color: string) {
+    const startPosX = window.innerWidth / 20
+    const startPosY = window.innerHeight / 20
+    const endPosX = window.innerWidth - startPosX
+    const endPosY = window.innerHeight - startPosY * 8
+    const blockSizeX = (endPosX - gap * (columns - 1) - startPosX) / columns
+    const blockSizeY = (endPosY - gap * (rows - 1) - startPosY) / rows
+
+    for (let row = 0; row < rows; row++) {
+      for (let column = 0; column < columns; column++) {
+        const blockX = startPosX + blockSizeX * column + gap * column
+        const blockY = startPosY + blockSizeY * row + gap * row
+        this.createBlock(blockX, blockY, blockSizeX, blockSizeY, color)
+      }
+    }
+
+  }
+
   getBlocks() {
     return this.blocks
   }
