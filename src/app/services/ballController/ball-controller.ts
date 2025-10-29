@@ -18,16 +18,16 @@ export class BallController {
         collisionHandler.updateCollisionRecord(ball.getCollisionRecordID(), ball.getPositions().x, ball.getPositions().y, ball.getSize(), ball.getSize())
       }
     })
-    collisionHandler.getCollisionListener().subscribe(collision => {
+    collisionHandler.getCollisionListener().subscribe(collision => { //OnCollision
       let ball = this.balls.find((x) => {
         return x.getCollisionRecordID() == collision?.sourceID
-      })
+      }) //Gets the ball that collided with the object
       if (ball) {
         if (
           collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().wall ||
           collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().ball ||
           collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().block) {
-          if (collision.sidesCollided.top) {
+          if (collision.sidesCollided.top) { //Change it's direction
             ball.setDirections(ball.getDirections().x, 1)
           } else if (collision.sidesCollided.bottom) {
             ball.setDirections(ball.getDirections().x, -1)
@@ -35,11 +35,10 @@ export class BallController {
             ball.setDirections(1, ball.getDirections().y)
           } else if (collision.sidesCollided.right) {
             ball.setDirections(-1, ball.getDirections().y)
-            console.log(ball.getDirections().x)
           }
-        } else if (collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().void) {
+        } else if (collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().void) { //Gone out of bounds on the bottom
           this.removeBall(ball)
-        } else if (collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().player) {
+        } else if (collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().player) { //Player hit
           if (collision.sidesCollided.top) {
             if (collision.distancesFromFaces.left < collision.distancesFromFaces.right) {
               ball.setDirections(1, 1)
@@ -88,6 +87,8 @@ class Ball {
   private positionX: number = 100;
   private positionY: number = 100;
 
+  private strength: number = 10; //Damage the ball does to blocks on contact
+
   private directionX: number = Math.random() > 0.5 ? 1 : -1;
   private directionY: number = -1;
 
@@ -107,6 +108,14 @@ class Ball {
     this.collisionRecordID = recordID
     this.positionX = positionX;
     this.positionY = positionY;
+  }
+
+  getStrength() {
+    return this.strength;
+  }
+
+  setStrength(strength: number) {
+    this.strength = strength;
   }
 
   getCollisionRecordID() {

@@ -16,14 +16,17 @@ export class BlockController {
       })
       if (block) {
         if (collision?.target?.getGameObject().objectType == collisionHandler.getGameObjectTypes().ball) {
-          this.deleteBlock(block)
+          block.setHealth(block.getHealth() - collision?.target.getGameObject().object.getStrength())
+          if (block.getHealth() <= 0) {
+            this.deleteBlock(block)
+          }
         }
       }
     })
   }
 
   createBlock(positionX: number, positionY: number, sizeX: number, sizeY: number, color: string) {
-    let block = new Block(sizeX, sizeY, color, "", positionX, positionY)
+    let block = new Block(positionX, positionY, sizeX, sizeY, color, "")
     const ballCollisionRecordID = this.collisionHandler.createCollisionRecord(positionX, positionY, sizeX, sizeY, block, this.collisionHandler.getGameObjectTypes().block, this.collisionHandler.getRenderTypes().rectangle)
     block.setCollisionRecordID(ballCollisionRecordID)
     this.blocks.push(block)
@@ -48,6 +51,19 @@ export class BlockController {
   }
 
   getBlocks() {
+    let data:Block[] = []
+    for (let block of this.blocks) {
+      let correctedSizes = {
+        x: block.getSize().x * block.getHealth() / block.getMaxHealth(),
+        y: block.getSize().y * block.getHealth() / block.getMaxHealth()
+      }
+      let copy = new Block(block.getPositions().x + (block.getSize().x - correctedSizes.x) / 2, block.getPositions().y + (block.getSize().y - correctedSizes.y) / 2, correctedSizes.x, correctedSizes.y, block.getColor(), block.getCollisionRecordID(), block.getMaxHealth(), block.getHealth())
+      data.push(copy)
+    }
+    return data
+  }
+
+  getRawBlocks() {
     return this.blocks
   }
 
@@ -62,12 +78,15 @@ class Block {
   private sizeY: number = 25;
   private color: string = 'red';
 
+  private maxHealth: number = 20;
+  private currentHealth: number = 20;
+
   private positionX: number = 100;
   private positionY: number = 100;
 
   private collisionRecordID: string = ''
 
-  constructor(sizeX: number, sizeY: number, color: string, recordID: string, positionX: number = 100, positionY: number = 100) {
+  constructor(positionX: number = 100, positionY: number = 100, sizeX: number, sizeY: number, color: string, recordID: string, maxHealth: number = 100, health?: number) {
     if (sizeX < 0) {
       console.error('A block has been created with a negative size on the x axis.');
     } else {
@@ -85,6 +104,28 @@ class Block {
     this.collisionRecordID = recordID
     this.positionX = positionX;
     this.positionY = positionY;
+    this.maxHealth = maxHealth;
+    if (health) {
+      this.currentHealth = health;
+    } else {
+      this.currentHealth = maxHealth;
+    }
+  }
+
+  getHealth() {
+    return this.currentHealth;
+  }
+
+  getMaxHealth() {
+    return this.maxHealth;
+  }
+
+  setHealth(health: number) {
+    this.currentHealth = health;
+  }
+
+  setMaxHealth(health: number) {
+    this.maxHealth = health;
   }
 
   getCollisionRecordID() {
@@ -92,6 +133,9 @@ class Block {
   }
 
   setCollisionRecordID(recordID: string) {
+    if (this.collisionRecordID != '') {
+      console.warn("A block's collision record ID has been changed. This may cause issues with collision detection. Record ID: " + this.collisionRecordID + " New Record ID: " + recordID)
+    }
     this.collisionRecordID = recordID;
   }
 

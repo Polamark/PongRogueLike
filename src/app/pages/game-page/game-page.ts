@@ -88,7 +88,7 @@ export class GamePage {
     let left = this.collisionHandler.createCollisionRecord(-300, -300, 300, window.innerHeight + 600, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
     let right = this.collisionHandler.createCollisionRecord(window.innerWidth, -300, 300, window.innerHeight + 600, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
     let top = this.collisionHandler.createCollisionRecord(-300, -300, window.innerWidth + 600, 300, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
-    let bottom = this.collisionHandler.createCollisionRecord(-300, window.innerHeight, window.innerWidth + 600, 300, null, this.collisionHandler.getGameObjectTypes().void, this.collisionHandler.getRenderTypes().rectangle)
+    let bottom = this.collisionHandler.createCollisionRecord(-300, window.innerHeight, window.innerWidth + 600, 300, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
     window.onresize = () => {
       this.collisionHandler.updateCollisionRecord(left, -300, -300, 300, window.innerHeight + 600)
       this.collisionHandler.updateCollisionRecord(right, window.innerWidth, -300, 300, window.innerHeight + 600)
