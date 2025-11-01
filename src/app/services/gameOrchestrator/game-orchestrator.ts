@@ -6,6 +6,12 @@ import {CollisionHandler} from '../collisionHandler/collision-handler';
 })
 export class GameOrchestrator {
   private money = signal<number>(0)
+
+  private maxHits = signal<number>(20) //How many times can the player object be hit before round end
+  private hitsLeft = signal<number>(this.maxHits())
+
+  private requiredMoneyToContinue = 20
+
   private currentStatus = gameStatus.inGame
   constructor(
     collisionHandler: CollisionHandler,
@@ -19,6 +25,29 @@ export class GameOrchestrator {
 
   getMoney() {
     return this.money
+  }
+
+  addHits(hits: number) {
+    this.hitsLeft.update(x => x + hits)
+  }
+
+  getHits() {
+    return this.hitsLeft
+  }
+
+  setMaxHits(hits: number) {
+    this.maxHits.set(hits)
+    this.hitsLeft.set(hits)
+  }
+
+  getMaxHits() {
+    return this.maxHits
+  }
+
+  setRequiredMoneyToContinue(money: number) {}
+
+  getRequiredMoneyToContinue() {
+    return this.requiredMoneyToContinue
   }
 }
 

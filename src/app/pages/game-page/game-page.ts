@@ -48,6 +48,7 @@ export class GamePage {
     canvasEl.height = window.innerHeight
     this.ctx = canvasEl.getContext('2d')
     if (this.ctx) {
+      this.ctx.clearRect(0, 0, canvasEl.width, canvasEl.height)
       this.ctx.fillStyle = 'white'
       this.ctx.fillRect(this.playerController.getPlayerPosition()() - this.playerController.getPlayerSize()() / 2, window.innerHeight * 19 / 20, this.playerController.getPlayerSize()(), this.playerController.getPlayerHeight()())
 
@@ -85,12 +86,12 @@ export class GamePage {
 
     //this.blockController.createBlock(100, 100, 100, 25, '#003764')
     this.ballController.createBall(window.innerWidth / 2, window.innerHeight * 18 / 20, 8, 0.3, 'gold', 10, 2)
-    this.blockController.createBlockGrid(13, 10, 20, 'gold')
+    this.blockController.createBlockGrid(13, 10, 20, 'blue')
     requestAnimationFrame(this.renderScene)
-    let left = this.collisionHandler.createCollisionRecord(-300, -300, 300, window.innerHeight + 600, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
-    let right = this.collisionHandler.createCollisionRecord(window.innerWidth, -300, 300, window.innerHeight + 600, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
-    let top = this.collisionHandler.createCollisionRecord(-300, -300, window.innerWidth + 600, 300, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
-    let bottom = this.collisionHandler.createCollisionRecord(-300, window.innerHeight, window.innerWidth + 600, 300, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
+    let left = this.collisionHandler.createCollisionRecord(-300, -300, 300, window.innerHeight + 600, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle, false)
+    let right = this.collisionHandler.createCollisionRecord(window.innerWidth, -300, 300, window.innerHeight + 600, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle, false)
+    let top = this.collisionHandler.createCollisionRecord(-300, -300, window.innerWidth + 600, 300, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle, false)
+    let bottom = this.collisionHandler.createCollisionRecord(-300, window.innerHeight, window.innerWidth + 600, 300, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle, false)
     window.onresize = () => {
       this.collisionHandler.updateCollisionRecord(left, -300, -300, 300, window.innerHeight + 600)
       this.collisionHandler.updateCollisionRecord(right, window.innerWidth, -300, 300, window.innerHeight + 600)

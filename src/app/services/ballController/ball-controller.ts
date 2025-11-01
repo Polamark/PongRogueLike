@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {GameLoopHandler} from '../gameLoopHandler/game-loop-handler';
 import {CollisionHandler} from '../collisionHandler/collision-handler';
+import {GameOrchestrator} from '../gameOrchestrator/game-orchestrator';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,7 @@ export class BallController {
 
   constructor(
     gameLoopHandler: GameLoopHandler,
+    gameOrchestrator: GameOrchestrator,
     public collisionHandler: CollisionHandler
   ) {
 
@@ -44,6 +46,7 @@ export class BallController {
         } else if (collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().void) { //Gone out of bounds on the bottom
           this.removeBall(ball)
         } else if (collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().player) { //Player hit
+          gameOrchestrator.addHits(-1)
           if (collision.sidesCollided.top) {
             if (collision.distancesFromFaces.left < collision.distancesFromFaces.right) {
               ball.setDirections(1, 1)
@@ -60,7 +63,6 @@ export class BallController {
             ball.setDirections(1, ball.getDirections().y)
           } else if (collision.sidesCollided.right) {
             ball.setDirections(-1, ball.getDirections().y)
-            console.log(ball.getDirections().x)
           }
           let audio = new Audio("sounds/beep.mp3")
           audio.load()
