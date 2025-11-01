@@ -1,3 +1,6 @@
-<canvas (pointermove)="playerController.changeDesiredPosition($event.clientX)" #gameCanvas></canvas>
+<canvas (pointerout)="this.gameLoopHandler.setGameRunning(false)" (pointerover)="this.gameLoopHandler.setGameRunning(true)"  (pointermove)="playerController.changeDesiredPosition($event.clientX)" #gameCanvas></canvas>
 
-<h1 class="fixed top-5 text-center text-amber-300 text-3xl bg-black w-15 h-15 left-5">{{Math.round(this.gameLoopHandler.getFps()())}}</h1>
+<h1 class="fixed top-5 text-center text-amber-300 text-3xl bg-black w-fit h-fit p-5 left-5">
+  FPS: {{Math.round(this.gameLoopHandler.getFps()())}} <br>
+  MONEY: {{Math.floor(gameOrchestrator.getMoney()())}}
+</h1>

@@ -4,6 +4,7 @@ import {BallController} from '../../services/ballController/ball-controller';
 import {GameLoopHandler} from '../../services/gameLoopHandler/game-loop-handler';
 import {CollisionHandler} from '../../services/collisionHandler/collision-handler';
 import {BlockController} from '../../services/blockController/block-controller';
+import {GameOrchestrator} from '../../services/gameOrchestrator/game-orchestrator';
 
 @Component({
   selector: 'app-game-page',
@@ -22,6 +23,7 @@ export class GamePage {
     public blockController: BlockController,
     public gameLoopHandler: GameLoopHandler,
     public collisionHandler: CollisionHandler,
+    public gameOrchestrator: GameOrchestrator,
     public cd: ChangeDetectorRef,
   ) {
     document.addEventListener('keydown', (event) => {
@@ -69,21 +71,21 @@ export class GamePage {
 
   ngAfterViewInit() {
     for (let i = 0; i < 0; i++) {
-      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20), 10, 0.25, 'red', )
-      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'blue')
-      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'green')
-      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'cyan')
-      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'yellow')
-      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'orange')
-      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'white')
-      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'gray')
-      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'purple')
-      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20),10, 0.25, 'pink')
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20), 10, 0.25, 'red', 1)
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20), 10, 0.25, 'blue', 1)
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20), 10, 0.25, 'green', 1)
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20), 10, 0.25, 'cyan', 1)
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20), 10, 0.25, 'yellow', 1)
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20), 10, 0.25, 'orange', 1)
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20), 10, 0.25, 'white', 1)
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20), 10, 0.25, 'gray',1 )
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20), 10, 0.25, 'purple', 1)
+      this.ballController.createBall(Math.random() * window.innerWidth, Math.random() * (window.innerHeight * 10 / 20), 10, 0.25, 'pink',1)
     }
 
     //this.blockController.createBlock(100, 100, 100, 25, '#003764')
-    this.ballController.createBall(window.innerWidth / 2, window.innerHeight * 18 / 20, 10, 0.25, 'red', )
-    this.blockController.createBlockGrid(13, 10, 20, '#003764')
+    this.ballController.createBall(window.innerWidth / 2, window.innerHeight * 18 / 20, 8, 0.3, 'gold', 10, 2)
+    this.blockController.createBlockGrid(13, 10, 20, 'gold')
     requestAnimationFrame(this.renderScene)
     let left = this.collisionHandler.createCollisionRecord(-300, -300, 300, window.innerHeight + 600, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)
     let right = this.collisionHandler.createCollisionRecord(window.innerWidth, -300, 300, window.innerHeight + 600, null, this.collisionHandler.getGameObjectTypes().wall, this.collisionHandler.getRenderTypes().rectangle)

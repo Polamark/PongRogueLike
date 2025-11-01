@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {CollisionHandler} from '../collisionHandler/collision-handler';
+import {GameOrchestrator} from '../gameOrchestrator/game-orchestrator';
 
 @Injectable({
   providedIn: 'root'
@@ -9,16 +10,23 @@ export class BlockController {
 
   constructor(
     public collisionHandler: CollisionHandler,
+    gameOrchestrator: GameOrchestrator,
   ) {
     collisionHandler.getCollisionListener().subscribe(collision => {
       let block = this.blocks.find((x) => {
-        return x.getCollisionRecordID() == collision?.sourceID
+        return x.getCollisionRecordID() == collision?.targetID
       })
       if (block) {
-        if (collision?.target?.getGameObject().objectType == collisionHandler.getGameObjectTypes().ball) {
-          block.setHealth(block.getHealth() - collision?.target.getGameObject().object.getStrength())
+        if (collision?.source?.getGameObject().objectType == collisionHandler.getGameObjectTypes().ball) {
+          const oldHealth = block.getHealth()
+          const strength = collision?.source.getGameObject().object.getStrength()
+          const newHealth = oldHealth - strength
+          block.setHealth(newHealth)
           if (block.getHealth() <= 0) {
+            gameOrchestrator.addMoney((strength * block.getPrizeBase() + block.getKillMultiplier()) * collision?.source.getGameObject().object.getMoneyMultiplier())
             this.deleteBlock(block)
+          } else {
+            gameOrchestrator.addMoney(strength * block.getPrizeBase() * collision?.source.getGameObject().object.getMoneyMultiplier())
           }
         }
       }
@@ -27,7 +35,7 @@ export class BlockController {
 
   createBlock(positionX: number, positionY: number, sizeX: number, sizeY: number, color: string) {
     let block = new Block(positionX, positionY, sizeX, sizeY, color, "")
-    const ballCollisionRecordID = this.collisionHandler.createCollisionRecord(positionX, positionY, sizeX, sizeY, block, this.collisionHandler.getGameObjectTypes().block, this.collisionHandler.getRenderTypes().rectangle)
+    const ballCollisionRecordID = this.collisionHandler.createCollisionRecord(positionX, positionY, sizeX, sizeY, block, this.collisionHandler.getGameObjectTypes().block, this.collisionHandler.getRenderTypes().rectangle, false)
     block.setCollisionRecordID(ballCollisionRecordID)
     this.blocks.push(block)
   }
@@ -51,7 +59,7 @@ export class BlockController {
   }
 
   getBlocks() {
-    let data:Block[] = []
+    let data: Block[] = []
     for (let block of this.blocks) {
       let correctedSizes = {
         x: block.getSize().x * block.getHealth() / block.getMaxHealth(),
@@ -78,15 +86,29 @@ class Block {
   private sizeY: number = 25;
   private color: string = 'red';
 
-  private maxHealth: number = 20;
-  private currentHealth: number = 20;
+  private maxHealth: number;
+  private currentHealth: number;
 
-  private positionX: number = 100;
-  private positionY: number = 100;
+  private prizeBase: number;
+  private killMultiplier: number;
+
+  private positionX: number;
+  private positionY: number;
 
   private collisionRecordID: string = ''
 
-  constructor(positionX: number = 100, positionY: number = 100, sizeX: number, sizeY: number, color: string, recordID: string, maxHealth: number = 100, health?: number) {
+  constructor(
+    positionX: number = 100,
+    positionY: number = 100,
+    sizeX: number,
+    sizeY: number,
+    color: string,
+    recordID: string,
+    maxHealth: number = 100,
+    health?: number,
+    prizeBase: number = 0.1,
+    killMultiplier: number = 50,
+    ) {
     if (sizeX < 0) {
       console.error('A block has been created with a negative size on the x axis.');
     } else {
@@ -110,6 +132,16 @@ class Block {
     } else {
       this.currentHealth = maxHealth;
     }
+    this.prizeBase = prizeBase;
+    this.killMultiplier = killMultiplier;
+  }
+
+  getKillMultiplier() {
+    return this.killMultiplier;
+  }
+
+  getPrizeBase() {
+    return this.prizeBase;
   }
 
   getHealth() {

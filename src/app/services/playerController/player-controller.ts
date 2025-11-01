@@ -15,7 +15,7 @@ export class PlayerController {
     gameLoopHandler: GameLoopHandler,
     collisionHandler: CollisionHandler,
   ) {
-    this.playerCollisionID = collisionHandler.createCollisionRecord(this.getCenteredPlayerPosition(), window.innerHeight * 19 / 20, this.playerObject.playerSize(), this.playerObject.playerHeight(), this.playerObject, collisionHandler.getGameObjectTypes().player, collisionHandler.getRenderTypes().rectangle)
+    this.playerCollisionID = collisionHandler.createCollisionRecord(this.getCenteredPlayerPosition(), window.innerHeight * 19 / 20, this.playerObject.playerSize(), this.playerObject.playerHeight(), this.playerObject, collisionHandler.getGameObjectTypes().player, collisionHandler.getRenderTypes().rectangle, false)
     gameLoopHandler.getGameUpdate().subscribe(() => {
       if (Math.abs(this.playerObject.desiredPosition() - this.playerObject.playerPosition()) > 10) {
         if (this.playerObject.desiredPosition() < this.playerObject.playerPosition()) {
