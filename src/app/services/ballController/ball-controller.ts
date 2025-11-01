@@ -12,6 +12,8 @@ export class BallController {
     gameLoopHandler: GameLoopHandler,
     public collisionHandler: CollisionHandler
   ) {
+
+
     gameLoopHandler.getGameUpdate().subscribe(() => {
       for (let ball of this.balls) {
         ball.setPositions(ball.getPositions().x + ball.getDirections().x * ball.getSpeed() * gameLoopHandler.getDelta()(), ball.getPositions().y + ball.getDirections().y * ball.getSpeed() * gameLoopHandler.getDelta()())
@@ -27,7 +29,7 @@ export class BallController {
           collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().wall ||
           collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().ball ||
           collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().block) {
-          if (collision.sidesCollided.top) { //Change it's direction
+          if (collision.sidesCollided.top) { //Change its direction
             ball.setDirections(ball.getDirections().x, 1)
           } else if (collision.sidesCollided.bottom) {
             ball.setDirections(ball.getDirections().x, -1)
@@ -36,6 +38,9 @@ export class BallController {
           } else if (collision.sidesCollided.right) {
             ball.setDirections(-1, ball.getDirections().y)
           }
+          let audio = new Audio("sounds/beep.mp3")
+          audio.load()
+          audio.play()
         } else if (collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().void) { //Gone out of bounds on the bottom
           this.removeBall(ball)
         } else if (collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().player) { //Player hit
@@ -57,13 +62,16 @@ export class BallController {
             ball.setDirections(-1, ball.getDirections().y)
             console.log(ball.getDirections().x)
           }
+          let audio = new Audio("sounds/beep.mp3")
+          audio.load()
+          audio.play()
         }
       }
     })
   }
 
-  createBall = (positionX: number = 100, positionY: number = 100, size: number, speed: number, color: string) => {
-    let ball = new Ball(size, speed, color, "", positionX, positionY)
+  createBall = (positionX: number = 100, positionY: number = 100, size: number, speed: number, color: string, strength?: number, moneyMultiplier?: number) => {
+    let ball = new Ball(positionX, positionY, size, speed, color, "", strength, moneyMultiplier)
     const ballCollisionRecordID = this.collisionHandler.createCollisionRecord(positionX, positionY, size, size, ball, this.collisionHandler.getGameObjectTypes().ball, this.collisionHandler.getRenderTypes().circle)
     ball.setCollisionRecordID(ballCollisionRecordID)
     this.balls.push(ball)
@@ -87,14 +95,15 @@ class Ball {
   private positionX: number = 100;
   private positionY: number = 100;
 
-  private strength: number = 10; //Damage the ball does to blocks on contact
+  private strength: number; //Damage the ball does to blocks on contact
+  private moneyMultiplier: number;
 
   private directionX: number = Math.random() > 0.5 ? 1 : -1;
   private directionY: number = -1;
 
   private collisionRecordID: string = ''
 
-  constructor(size: number, speed: number, color: string, recordID: string, positionX: number = 100, positionY: number = 100) {
+  constructor(positionX: number = 100, positionY: number = 100, size: number, speed: number, color: string, recordID: string, strength: number = 10, multiplier: number = 1) {
     if (size < 0) {
       console.error('A ball has been created with a negative size.');
     } else {
@@ -108,6 +117,16 @@ class Ball {
     this.collisionRecordID = recordID
     this.positionX = positionX;
     this.positionY = positionY;
+    this.strength = strength;
+    this.moneyMultiplier = multiplier;
+  }
+
+  getMoneyMultiplier() {
+    return this.moneyMultiplier;
+  }
+
+  setMoneyMultiplier(multiplier: number) {
+    this.moneyMultiplier = multiplier;
   }
 
   getStrength() {

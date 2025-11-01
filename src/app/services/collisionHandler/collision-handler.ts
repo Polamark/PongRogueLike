@@ -21,7 +21,7 @@ export class CollisionHandler {
   }
 
   private checkCollision() {
-    for (let record of this.records) {
+    for (let record of this.records.filter(record => record.getCanBeSourceOfCollision())) {
       for (let other of this.records) {
         if (record === other) {
           continue
@@ -55,6 +55,7 @@ export class CollisionHandler {
               source: record,
               sourceID: record.recordID,
               target: other,
+              targetID: other.recordID,
               sidesCollided: collisions,
               distancesFromFaces: distance,
             })
@@ -67,11 +68,8 @@ export class CollisionHandler {
     }
   }
 
-  createCollisionRecord(left: number, top: number, width: number, height: number, gameObject?: any, gameObjectType?: gameObjectType, renderType?: objectRenderType) {
-    this.records.push(new CollisionRecord(left, top, width, height, gameObject, gameObjectType, renderType))
-    if (gameObjectType == this.getGameObjectTypes().ball) {
-      console.log(this.records[this.records.length - 1].getData())
-    }
+  createCollisionRecord(left: number, top: number, width: number, height: number, gameObject?: any, gameObjectType?: gameObjectType, renderType?: objectRenderType, canBeSourceOfCollision?: boolean) {
+    this.records.push(new CollisionRecord(left, top, width, height, gameObject, gameObjectType, renderType, canBeSourceOfCollision))
     return this.records[this.records.length - 1].recordID
   }
 
@@ -108,9 +106,10 @@ class CollisionRecord {
   private gameObjectType: gameObjectType = gameObjectType.unassigned
   private renderType: objectRenderType = objectRenderType.rectangle
   private touching: string[] = [];
+  private canBeSourceOfCollision: boolean;
   readonly recordID: string = crypto.randomUUID()
 
-  constructor(left: number, top: number, width: number, height: number, gameObject?: any, gameObjectType?: gameObjectType, renderType?: objectRenderType) {
+  constructor(left: number, top: number, width: number, height: number, gameObject?: any, gameObjectType?: gameObjectType, renderType?: objectRenderType, canBeSourceOfCollision?: boolean,) {
 
     if (!renderType) {
       console.error("Object does not have a render type. Defaulting to rectangle.")
@@ -139,6 +138,8 @@ class CollisionRecord {
     } else if (gameObjectType) {
       this.gameObjectType = gameObjectType
     }
+
+    this.canBeSourceOfCollision = canBeSourceOfCollision ?? true;
   }
 
   getData() {
@@ -182,6 +183,10 @@ class CollisionRecord {
   untouch(otherRecord: CollisionRecord) {
     this.touching = this.touching.filter(recordID => recordID !== otherRecord.recordID)
   }
+
+  getCanBeSourceOfCollision() {
+    return this.canBeSourceOfCollision
+  }
 }
 
 class gameObjectType {
@@ -202,6 +207,7 @@ interface collisionBroadcast {
   source: CollisionRecord,
   sourceID: string,
   target: CollisionRecord,
+  targetID: string,
   sidesCollided: {
     left: boolean,
     right: boolean,

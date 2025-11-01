@@ -12,6 +12,7 @@ export class GameLoopHandler {
   private gameUpdate$ = toObservable(this.gameUpdate)
 
 
+
   setDelta(delta: number) {
     this.delta.set(delta)
     this.fps.set(1000 / delta)
