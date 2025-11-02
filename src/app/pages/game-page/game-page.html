@@ -1,10 +1,22 @@
-<canvas (pointerout)="this.gameLoopHandler.setGameRunning(false)" (pointerover)="this.gameLoopHandler.setGameRunning(true)"  (pointermove)="playerController.changeDesiredPosition($event.clientX)" #gameCanvas></canvas>
+<canvas (pointerout)="this.gameLoopHandler.setGameRunning(false)"
+        (pointerover)="this.gameLoopHandler.setGameRunning(true)"
+        (pointermove)="playerController.changeDesiredPosition($event.clientX)" #gameCanvas></canvas>
 
 <h1 class="fixed top-5 invisible text-center text-amber-300 text-3xl bg-black w-fit h-fit p-5 left-5">
-  FPS: {{Math.round(this.gameLoopHandler.getFps()())}} <br>
-  MONEY: {{Math.floor(gameOrchestrator.getMoney()())}}
+  FPS: {{ Math.round(this.gameLoopHandler.getFps()()) }} <br>
+  MONEY: {{ Math.floor(gameOrchestrator.getMoney()()) }}
 </h1>
 
-<div class="fixed invisible bottom-0 right-0 bg-green-400 opacity-90 w-2.5" [style.height.%]="gameOrchestrator.getHits()() / gameOrchestrator.getMaxHits()() * 100">
+<div class="fixed invisible bottom-0 right-0 bg-green-400 opacity-90 w-2.5"
+     [style.height.%]="gameOrchestrator.getHits()() / gameOrchestrator.getMaxHits()() * 100">
 
 </div>
+
+@if (gameOrchestrator.getGameOver()) {
+  <h2 class="flex justify-center items-center gap-3 flex-col w-screen h-screen fixed top-0 left-0 bg-black text-white text-6xl">
+    GAME OVER
+    <span class="text-xl">
+      Refresh to start again.
+    </span>
+  </h2>
+}

@@ -49,11 +49,23 @@ export class GameOrchestrator {
   getRequiredMoneyToContinue() {
     return this.requiredMoneyToContinue
   }
+
+  getStatus() {
+    return this.currentStatus
+  }
+
+  noBallsRemaining() {
+    this.currentStatus = gameStatus.over
+  }
+
+  getGameOver() {
+    return this.currentStatus == gameStatus.over
+  }
 }
 
 class gameStatus {
   static inShop = "shop"
   static inGame = "game"
   static inMenu = "menu"
-
+  static over = "over"
 }

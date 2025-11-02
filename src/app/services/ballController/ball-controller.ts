@@ -45,6 +45,9 @@ export class BallController {
           audio.play()
         } else if (collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().void) { //Gone out of bounds on the bottom
           this.removeBall(ball)
+          if (this.balls.length <= 0) {
+            gameOrchestrator.noBallsRemaining()
+          }
         } else if (collision?.target.getGameObject().objectType == collisionHandler.getGameObjectTypes().player) { //Player hit
           gameOrchestrator.addHits(-1)
           if (collision.sidesCollided.top) {
